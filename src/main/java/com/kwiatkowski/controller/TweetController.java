@@ -7,9 +7,7 @@ import org.springframework.social.twitter.api.Tweet;
 import org.springframework.social.twitter.api.Twitter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -22,18 +20,23 @@ import java.util.stream.Collectors;
 @Controller
 public class TweetController {
 
-    @Autowired
     private Twitter twitter;
 
-    @RequestMapping("/")
+    @Autowired
+    public TweetController(Twitter twitter) {
+        this.twitter = twitter;
+    }
+
+    @GetMapping("/")
     public String home() {
         return "searchPage";
     }
-    @RequestMapping("/result")
+    @GetMapping("/result")
     public String hello(@RequestParam(defaultValue =  "pokemon") String search,
                         Model model) {
         SearchResults searchResults = twitter.searchOperations().search(search);
         List<Tweet> tweets = searchResults.getTweets();
+//        List<String> tweets = searchResults.getTweets()
 //                .stream()
 //                .map(Tweet::getText)
 //                .collect(Collectors.toList());
@@ -41,10 +44,10 @@ public class TweetController {
         model.addAttribute("search", search);
         return "result";
     }
-    @RequestMapping(value = "/postSearch", method = RequestMethod.POST)
+    @PostMapping(value = "/postSearch")
     public String postSearch(HttpServletRequest request, RedirectAttributes redirectAttributes) {
         String search = request.getParameter("search");
-        if(search.toLowerCase().contains("kurw")) {
+        if(search.toLowerCase().contains("error")) {
             redirectAttributes.addFlashAttribute("error", "Sprobuj wpisac inny wyraz!");
             return "redirect:/";
         }
